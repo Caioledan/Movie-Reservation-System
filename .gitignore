@@ -141,3 +141,16 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+/generated/prisma
+
+/dist
+
+.env.test
+
+.agents
+.claude
+.windsurf
+skills-lock.json
+
+coverage/
