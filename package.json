@@ -75,14 +75,20 @@
       "ts"
     ],
     "rootDir": ".",
-    "roots": ["<rootDir>/src/", "<rootDir>/generated/"],
+    "roots": [
+      "<rootDir>/src/",
+      "<rootDir>/generated/"
+    ],
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": [
         "ts-jest",
         {
           "diagnostics": {
-            "ignoreCodes": [5101, 5011]
+            "ignoreCodes": [
+              5101,
+              5011
+            ]
           }
         }
       ]
