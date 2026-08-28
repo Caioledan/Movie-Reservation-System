@@ -21,6 +21,7 @@ model User {
   role      Role     @default(CUSTOMER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  tickets   Ticket[]
 }
 
 enum Role {
@@ -29,7 +30,7 @@ enum Role {
 }
 
 model Movie {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   title       String
   description String
   posterImage String
@@ -38,6 +39,63 @@ model Movie {
   duration    Int
   language    String
   releaseDate DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  sessions    Session[]
+}
+
+model Room {
+  id        String    @id @default(uuid())
+  number    Int
+  capacity  Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  sessions  Session[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  movieId   String
+  roomId    String
+  startTime DateTime
+  endTime   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  movie     Movie    @relation(fields: [movieId], references: [id])
+  room      Room     @relation(fields: [roomId], references: [id])
+  seats     Seat[]
+  tickets   Ticket[]
+}
+
+model Seat {
+  id         String   @id @default(uuid())
+  sessionId  String
+  seatNumber String
+  isBooked   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  session    Session  @relation(fields: [sessionId], references: [id])
+  tickets    Ticket[]
+}
+
+model Ticket {
+  id            String       @id @default(uuid())
+  sessionId     String
+  seatId        String
+  userId        String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  session       Session      @relation(fields: [sessionId], references: [id])
+  seat          Seat         @relation(fields: [seatId], references: [id])
+  user          User         @relation(fields: [userId], references: [id])
+  transactionId String
+  totalAmount   Float
+  status        TicketStatus
+}
+
+enum TicketStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
 }

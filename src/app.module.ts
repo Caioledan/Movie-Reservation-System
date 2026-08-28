@@ -6,6 +6,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { MovieModule } from './movie/movie.module';
+import { RoomModule } from './room/room.module';
+import { RoomModule } from './room/room.module';
 
 @Module({
   imports: [
@@ -13,7 +15,7 @@ import { MovieModule } from './movie/movie.module';
     PrismaModule, 
     UserModule, 
     AuthModule, 
-    MovieModule
+    MovieModule, RoomModule
   ],
   controllers: [AppController],
   providers: [AppService],
