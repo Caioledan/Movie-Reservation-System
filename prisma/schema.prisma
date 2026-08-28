@@ -65,6 +65,13 @@ model Session {
   room      Room     @relation(fields: [roomId], references: [id])
   seats     Seat[]
   tickets   Ticket[]
+  status    SessionStatus @default(ACTIVE)
+}
+
+enum SessionStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
 }
 
 model Seat {

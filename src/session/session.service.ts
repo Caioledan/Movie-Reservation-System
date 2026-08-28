@@ -2,6 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { CreateSessionDto } from './dto/create-session.dto';
 import { UpdateSessionDto } from './dto/update-session.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SessionStatus } from 'generated/prisma/enums';
 
 @Injectable()
 export class SessionService {
@@ -75,6 +76,14 @@ export class SessionService {
         seats: true,
         tickets: true,
       },
+    })
+
+    return sessions;
+  }
+
+  async getSessionByStatus(status: SessionStatus) {
+    const sessions = await this.prisma.session.findMany({
+      where: {status: status}
     })
 
     return sessions;
