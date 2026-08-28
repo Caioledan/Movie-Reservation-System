@@ -13,4 +13,9 @@ export class CreateRoomDto {
   @IsInt({ message: 'Capacity must be an integer.' })
   @Min(1, { message: 'Capacity must be at least 1.' })
   capacity!: number;
+
+  @ApiProperty({ example: 10, description: 'Number of seats per row.', required: false })
+  @IsInt({ message: 'Seats per row must be an integer.' })
+  @Min(1, { message: 'Seats per row must be at least 1.' })
+  seatsPerRow?: number;
 }

@@ -22,6 +22,9 @@ const prismaServiceMock = {
     delete: jest.fn(),
     findMany: jest.fn(),
   },
+  seat: {
+    createMany: jest.fn(),
+  }
 };
 
 describe('RoomService', () => {
@@ -52,19 +55,23 @@ describe('RoomService', () => {
   describe('createRoom', () => {
     const createDto: CreateRoomDto = {
       number: 1,
-      capacity: 100,
+      capacity: 10,
+      seatsPerRow: 5,
     };
 
-    it('should successfully create a room', async () => {
+    it('should successfully create a room and its seats', async () => {
       (prisma.room.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.room.create as jest.Mock).mockResolvedValue(mockRoom);
+      (prisma.seat.createMany as jest.Mock).mockResolvedValue({ count: 10 });
 
       const result = await service.createRoom(createDto);
 
       expect(prisma.room.findFirst).toHaveBeenCalledWith({
         where: { number: createDto.number },
       });
-      expect(prisma.room.create).toHaveBeenCalledWith({ data: createDto });
+      const { seatsPerRow, ...roomData } = createDto;
+      expect(prisma.room.create).toHaveBeenCalledWith({ data: roomData });
+      expect(prisma.seat.createMany).toHaveBeenCalled();
       expect(result).toEqual(mockRoom);
     });
 
@@ -73,14 +80,15 @@ describe('RoomService', () => {
 
       await expect(service.createRoom(createDto)).rejects.toThrow(ConflictException);
       expect(prisma.room.create).not.toHaveBeenCalled();
+      expect(prisma.seat.createMany).not.toHaveBeenCalled();
     });
   });
 
   describe('updateRoom', () => {
-    const updateDto: UpdateRoomDto = { capacity: 150 };
+    const updateDto: UpdateRoomDto = { number: 2 };
 
     it('should successfully update a room', async () => {
-      const updatedRoom = { ...mockRoom, capacity: 150 };
+      const updatedRoom = { ...mockRoom, number: 2 };
       (prisma.room.findUnique as jest.Mock).mockResolvedValue(mockRoom);
       (prisma.room.update as jest.Mock).mockResolvedValue(updatedRoom);
 

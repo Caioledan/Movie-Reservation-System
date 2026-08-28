@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RoomController } from './room.controller';
-import { RoomService } from './room.service';
+import { TicketController } from './ticket.controller';
+import { TicketService } from './ticket.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-describe('RoomController', () => {
-  let controller: RoomController;
+describe('TicketController', () => {
+  let controller: TicketController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [RoomController],
+      controllers: [TicketController],
       providers: [
-        RoomService,
+        TicketService,
         {
           provide: PrismaService,
           useValue: {},
@@ -18,7 +18,7 @@ describe('RoomController', () => {
       ],
     }).compile();
 
-    controller = module.get<RoomController>(RoomController);
+    controller = module.get<TicketController>(TicketController);
   });
 
   it('should be defined', () => {

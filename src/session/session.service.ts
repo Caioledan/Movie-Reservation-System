@@ -22,6 +22,14 @@ export class SessionService {
       throw new ConflictException("Session already exists.");
     }
 
+    const room = await this.prisma.room.findUnique({
+      where: { id: data.roomId }
+    });
+
+    if (!room) {
+      throw new NotFoundException("Room not found.");
+    }
+
     const newSession = await this.prisma.session.create({ data: data });
 
     return newSession;
@@ -72,8 +80,11 @@ export class SessionService {
     const sessions = await this.prisma.session.findMany({
       include: {
         movie: true,
-        room: true,
-        seats: true,
+        room: {
+          include: {
+            seats: true,
+          }
+        },
         tickets: true,
       },
     })
@@ -87,5 +98,51 @@ export class SessionService {
     })
 
     return sessions;
+  }
+
+  async getAvailableSeats(sessionId: string) {
+    const session = await this.prisma.session.findUnique({
+      where: { id: sessionId },
+      include: {
+        room: {
+          include: {
+            seats: true
+          }
+        },
+        tickets: true
+      }
+    });
+
+    if (!session) {
+      throw new NotFoundException("Session not found.");
+    }
+
+    const reservedSeatIds = session.tickets.map(t => t.seatId);
+    const availableSeats = session.room.seats.filter(seat => !reservedSeatIds.includes(seat.id));
+
+    return availableSeats;
+  }
+
+  async getReservedSeats(sessionId: string) {
+    const session = await this.prisma.session.findUnique({
+      where: { id: sessionId },
+      include: {
+        room: {
+          include: {
+            seats: true
+          }
+        },
+        tickets: true
+      }
+    });
+
+    if (!session) {
+      throw new NotFoundException("Session not found.");
+    }
+
+    const reservedSeatIds = session.tickets.map(t => t.seatId);
+    const reservedSeats = session.room.seats.filter(seat => reservedSeatIds.includes(seat.id));
+
+    return reservedSeats;
   }
 }

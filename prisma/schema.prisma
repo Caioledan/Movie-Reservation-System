@@ -51,6 +51,7 @@ model Room {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   sessions  Session[]
+  seats     Seat[]
 }
 
 model Session {
@@ -63,7 +64,6 @@ model Session {
   updatedAt DateTime @updatedAt
   movie     Movie    @relation(fields: [movieId], references: [id])
   room      Room     @relation(fields: [roomId], references: [id])
-  seats     Seat[]
   tickets   Ticket[]
   status    SessionStatus @default(ACTIVE)
 }
@@ -76,12 +76,11 @@ enum SessionStatus {
 
 model Seat {
   id         String   @id @default(uuid())
-  sessionId  String
+  roomId     String
   seatNumber String
-  isBooked   Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  session    Session  @relation(fields: [sessionId], references: [id])
+  room       Room     @relation(fields: [roomId], references: [id])
   tickets    Ticket[]
 }
 

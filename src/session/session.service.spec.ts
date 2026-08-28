@@ -24,6 +24,12 @@ const prismaServiceMock = {
     delete: jest.fn(),
     findMany: jest.fn(),
   },
+  room: {
+    findUnique: jest.fn(),
+  },
+  seat: {
+    createMany: jest.fn(),
+  },
 };
 
 describe('SessionService', () => {
@@ -59,8 +65,9 @@ describe('SessionService', () => {
       endTime: mockSession.endTime,
     };
 
-    it('should successfully create a session', async () => {
+    it('should successfully create a session and generate seats', async () => {
       (prisma.session.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.room.findUnique as jest.Mock).mockResolvedValue({ id: createDto.roomId, capacity: 10 });
       (prisma.session.create as jest.Mock).mockResolvedValue(mockSession);
 
       const result = await service.createSession(createDto);
@@ -73,6 +80,7 @@ describe('SessionService', () => {
           endTime: createDto.endTime,
         },
       });
+      expect(prisma.room.findUnique).toHaveBeenCalledWith({ where: { id: createDto.roomId } });
       expect(prisma.session.create).toHaveBeenCalledWith({ data: createDto });
       expect(result).toEqual(mockSession);
     });
@@ -81,6 +89,14 @@ describe('SessionService', () => {
       (prisma.session.findFirst as jest.Mock).mockResolvedValue(mockSession);
 
       await expect(service.createSession(createDto)).rejects.toThrow(ConflictException);
+      expect(prisma.session.create).not.toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException if room is not found', async () => {
+      (prisma.session.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.room.findUnique as jest.Mock).mockResolvedValue(null);
+
+      await expect(service.createSession(createDto)).rejects.toThrow(NotFoundException);
       expect(prisma.session.create).not.toHaveBeenCalled();
     });
   });
@@ -158,8 +174,11 @@ describe('SessionService', () => {
       expect(prisma.session.findMany).toHaveBeenCalledWith({
         include: {
           movie: true,
-          room: true,
-          seats: true,
+          room: {
+            include: {
+              seats: true,
+            }
+          },
           tickets: true,
         },
       });

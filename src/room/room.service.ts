@@ -16,9 +16,37 @@ export class RoomService {
       throw new ConflictException('Room already exists.');
     }
 
+    const { seatsPerRow, ...roomData } = data;
+
     const newRoom = await this.prisma.room.create({
-      data: data,
+      data: roomData,
     });
+
+    const seatsToCreate: { roomId: string; seatNumber: string }[] = [];
+    const actualSeatsPerRow = seatsPerRow || 10;
+
+    for (let i = 0; i < newRoom.capacity; i++) {
+      const rowIndex = Math.floor(i / actualSeatsPerRow);
+      const seatIndex = (i % actualSeatsPerRow) + 1;
+
+      let rowLetter = '';
+      let tempIndex = rowIndex;
+      while (tempIndex >= 0) {
+        rowLetter = String.fromCharCode(65 + (tempIndex % 26)) + rowLetter;
+        tempIndex = Math.floor(tempIndex / 26) - 1;
+      }
+
+      seatsToCreate.push({
+        roomId: newRoom.id,
+        seatNumber: `${rowLetter}${seatIndex}`,
+      });
+    }
+
+    if (seatsToCreate.length > 0) {
+      await this.prisma.seat.createMany({
+        data: seatsToCreate,
+      });
+    }
 
     return newRoom;
   }
