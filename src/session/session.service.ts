@@ -1,0 +1,82 @@
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { CreateSessionDto } from './dto/create-session.dto';
+import { UpdateSessionDto } from './dto/update-session.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+
+@Injectable()
+export class SessionService {
+  constructor(private prisma: PrismaService) { }
+
+  async createSession(data: CreateSessionDto) {
+    const sessionExists = await this.prisma.session.findFirst({
+      where: {
+        movieId: data.movieId,
+        roomId: data.roomId,
+        startTime: data.startTime,
+        endTime: data.endTime
+      }
+    })
+
+    if (sessionExists) {
+      throw new ConflictException("Session already exists.");
+    }
+
+    const newSession = await this.prisma.session.create({ data: data });
+
+    return newSession;
+  }
+
+  async updateSession(sessionId: string, data: UpdateSessionDto) {
+    const sessionExists = await this.prisma.session.findUnique({ where: { id: sessionId } })
+
+    if (!sessionExists) {
+      throw new NotFoundException("Session not found.")
+    }
+
+    const sessionUpdated = await this.prisma.session.update({
+      where: { id: sessionId },
+      data: data,
+    })
+
+    return sessionUpdated;
+  }
+
+  async deleteSession(sessionId: string) {
+    const sessionExists = await this.prisma.session.findUnique({ where: { id: sessionId } })
+
+    if (!sessionExists) {
+      throw new NotFoundException("Session not found.")
+    }
+
+    const sessionDeleted = await this.prisma.session.delete({
+      where: { id: sessionId },
+    })
+
+    return sessionDeleted;
+  }
+
+  async getSession(sessionId: string) {
+    const sessionExists = await this.prisma.session.findUnique({
+      where: { id: sessionId }
+    })
+
+    if (!sessionExists) {
+      throw new NotFoundException("Session not found.")
+    }
+
+    return sessionExists;
+  }
+
+  async getAllSessions() {
+    const sessions = await this.prisma.session.findMany({
+      include: {
+        movie: true,
+        room: true,
+        seats: true,
+        tickets: true,
+      },
+    })
+
+    return sessions;
+  }
+}
