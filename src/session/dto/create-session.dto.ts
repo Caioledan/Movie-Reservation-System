@@ -8,11 +8,7 @@ export class CreateSessionDto {
   @MinDate(new Date(), { message: 'Start time must be in the future.' })
   startTime!: Date;
 
-  @ApiProperty()
-  @IsNotEmpty({ message: 'End time is required.' })
-  @IsDate({ message: 'End time must be a date.' })
-  @MinDate(new Date(), { message: 'End time must be in the future.' })
-  endTime!: Date;
+
 
   @ApiProperty()
   @IsNotEmpty({ message: 'Room ID is required.' })

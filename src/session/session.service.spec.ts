@@ -24,6 +24,9 @@ const prismaServiceMock = {
     delete: jest.fn(),
     findMany: jest.fn(),
   },
+  movie: {
+    findUnique: jest.fn(),
+  },
   room: {
     findUnique: jest.fn(),
   },
@@ -62,37 +65,48 @@ describe('SessionService', () => {
       movieId: mockSession.movieId,
       roomId: mockSession.roomId,
       startTime: mockSession.startTime,
-      endTime: mockSession.endTime,
-    };
+    } as CreateSessionDto;
 
     it('should successfully create a session and generate seats', async () => {
+      (prisma.movie.findUnique as jest.Mock).mockResolvedValue({ id: createDto.movieId, duration: 120 });
       (prisma.session.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.room.findUnique as jest.Mock).mockResolvedValue({ id: createDto.roomId, capacity: 10 });
       (prisma.session.create as jest.Mock).mockResolvedValue(mockSession);
 
       const result = await service.createSession(createDto);
 
+      const expectedEndTime = new Date(createDto.startTime.getTime() + 120 * 60000);
+
       expect(prisma.session.findFirst).toHaveBeenCalledWith({
         where: {
-          movieId: createDto.movieId,
           roomId: createDto.roomId,
-          startTime: createDto.startTime,
-          endTime: createDto.endTime,
+          status: { not: 'CANCELLED' },
+          startTime: { lt: expectedEndTime },
+          endTime: { gt: createDto.startTime },
         },
       });
       expect(prisma.room.findUnique).toHaveBeenCalledWith({ where: { id: createDto.roomId } });
-      expect(prisma.session.create).toHaveBeenCalledWith({ data: createDto });
+      expect(prisma.session.create).toHaveBeenCalledWith({ data: { ...createDto, endTime: expectedEndTime } });
       expect(result).toEqual(mockSession);
     });
 
-    it('should throw ConflictException if session already exists', async () => {
+    it('should throw ConflictException if room is already booked for this time slot', async () => {
+      (prisma.movie.findUnique as jest.Mock).mockResolvedValue({ id: createDto.movieId, duration: 120 });
       (prisma.session.findFirst as jest.Mock).mockResolvedValue(mockSession);
 
       await expect(service.createSession(createDto)).rejects.toThrow(ConflictException);
       expect(prisma.session.create).not.toHaveBeenCalled();
     });
 
+    it('should throw NotFoundException if movie is not found', async () => {
+      (prisma.movie.findUnique as jest.Mock).mockResolvedValue(null);
+
+      await expect(service.createSession(createDto)).rejects.toThrow(NotFoundException);
+      expect(prisma.session.create).not.toHaveBeenCalled();
+    });
+
     it('should throw NotFoundException if room is not found', async () => {
+      (prisma.movie.findUnique as jest.Mock).mockResolvedValue({ id: createDto.movieId, duration: 120 });
       (prisma.session.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.room.findUnique as jest.Mock).mockResolvedValue(null);
 
@@ -107,14 +121,18 @@ describe('SessionService', () => {
     it('should successfully update a session', async () => {
       const updatedSession = { ...mockSession, startTime: updateDto.startTime };
       (prisma.session.findUnique as jest.Mock).mockResolvedValue(mockSession);
+      (prisma.movie.findUnique as jest.Mock).mockResolvedValue({ id: mockSession.movieId, duration: 120 });
+      (prisma.session.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.session.update as jest.Mock).mockResolvedValue(updatedSession);
 
       const result = await service.updateSession(mockSession.id, updateDto);
 
+      const expectedEndTime = new Date(updateDto.startTime!.getTime() + 120 * 60000);
+
       expect(prisma.session.findUnique).toHaveBeenCalledWith({ where: { id: mockSession.id } });
       expect(prisma.session.update).toHaveBeenCalledWith({
         where: { id: mockSession.id },
-        data: updateDto,
+        data: { ...updateDto, endTime: expectedEndTime },
       });
       expect(result).toEqual(updatedSession);
     });
@@ -123,6 +141,15 @@ describe('SessionService', () => {
       (prisma.session.findUnique as jest.Mock).mockResolvedValue(null);
 
       await expect(service.updateSession('invalid-id', updateDto)).rejects.toThrow(NotFoundException);
+      expect(prisma.session.update).not.toHaveBeenCalled();
+    });
+
+    it('should throw ConflictException if updated time overlaps with another session', async () => {
+      (prisma.session.findUnique as jest.Mock).mockResolvedValue(mockSession);
+      (prisma.movie.findUnique as jest.Mock).mockResolvedValue({ id: mockSession.movieId, duration: 120 });
+      (prisma.session.findFirst as jest.Mock).mockResolvedValue({ id: 'another-session' });
+
+      await expect(service.updateSession(mockSession.id, updateDto)).rejects.toThrow(ConflictException);
       expect(prisma.session.update).not.toHaveBeenCalled();
     });
   });

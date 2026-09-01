@@ -8,10 +8,18 @@ export class AuthService {
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async login(email: string, password: string) {
-    const user = await this.usersService.getByEmail(email);
+    let user;
+    try {
+      user = await this.usersService.getUserByEmail(email);
+    } catch (error: any) {
+      if (error.name === 'NotFoundException') {
+        throw new UnauthorizedException('E-mail or password incorrect.');
+      }
+      throw error;
+    }
 
     if (!user) {
       throw new UnauthorizedException('E-mail or password incorrect.');

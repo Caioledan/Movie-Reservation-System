@@ -9,17 +9,27 @@ export class SessionService {
   constructor(private prisma: PrismaService) { }
 
   async createSession(data: CreateSessionDto) {
+    const movie = await this.prisma.movie.findUnique({
+      where: { id: data.movieId }
+    });
+
+    if (!movie) {
+      throw new NotFoundException("Movie not found.");
+    }
+
+    const calculatedEndTime = new Date(data.startTime.getTime() + movie.duration * 60000);
+
     const sessionExists = await this.prisma.session.findFirst({
       where: {
-        movieId: data.movieId,
         roomId: data.roomId,
-        startTime: data.startTime,
-        endTime: data.endTime
+        status: { not: 'CANCELLED' },
+        startTime: { lt: calculatedEndTime },
+        endTime: { gt: data.startTime }
       }
     })
 
     if (sessionExists) {
-      throw new ConflictException("Session already exists.");
+      throw new ConflictException("Room is already booked for this time slot.");
     }
 
     const room = await this.prisma.room.findUnique({
@@ -30,7 +40,12 @@ export class SessionService {
       throw new NotFoundException("Room not found.");
     }
 
-    const newSession = await this.prisma.session.create({ data: data });
+    const newSession = await this.prisma.session.create({ 
+      data: {
+        ...data,
+        endTime: calculatedEndTime
+      }
+    });
 
     return newSession;
   }
@@ -42,9 +57,45 @@ export class SessionService {
       throw new NotFoundException("Session not found.")
     }
 
+    let calculatedEndTime: Date | undefined;
+
+    if (data.startTime || data.movieId) {
+      const newStartTime = data.startTime || sessionExists.startTime;
+      const newMovieId = data.movieId || sessionExists.movieId;
+
+      const movie = await this.prisma.movie.findUnique({
+        where: { id: newMovieId }
+      });
+
+      if (!movie) {
+        throw new NotFoundException("Movie not found.");
+      }
+
+      calculatedEndTime = new Date(newStartTime.getTime() + movie.duration * 60000);
+
+      const overlappingSession = await this.prisma.session.findFirst({
+        where: {
+          roomId: sessionExists.roomId,
+          id: { not: sessionId },
+          status: { not: 'CANCELLED' },
+          startTime: { lt: calculatedEndTime },
+          endTime: { gt: newStartTime }
+        }
+      });
+
+      if (overlappingSession) {
+        throw new ConflictException("Room is already booked for this time slot.");
+      }
+    }
+
+    const updateData: any = { ...data };
+    if (calculatedEndTime) {
+      updateData.endTime = calculatedEndTime;
+    }
+
     const sessionUpdated = await this.prisma.session.update({
       where: { id: sessionId },
-      data: data,
+      data: updateData,
     })
 
     return sessionUpdated;
