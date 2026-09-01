@@ -1,9 +1,23 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "rootDir": "..",
   "testEnvironment": "node",
-  "testRegex": ".e2e-spec.ts$",
+  "testRegex": "test/.*\\.e2e-spec\\.ts$",
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
+    "^.+\\.(t|j)s$": [
+      "ts-jest",
+      {
+        "diagnostics": { "ignoreCodes": [5101] },
+        "tsconfig": { "module": "CommonJS" }
+      }
+    ]
+  },
+  "modulePaths": ["<rootDir>"],
+  "moduleNameMapper": {
+    "^generated/prisma/(.*)\\.js$": "<rootDir>/generated/prisma/$1.ts",
+    "^generated/prisma/(.*)$": "<rootDir>/generated/prisma/$1",
+    "^\\./enums\\.js$": "<rootDir>/generated/prisma/enums.ts",
+    "^\\./internal/(.*)\\.js$": "<rootDir>/generated/prisma/internal/$1.ts",
+    "^\\./runtime/(.*)\\.js$": "<rootDir>/generated/prisma/runtime/$1.ts"
   }
 }

@@ -23,6 +23,5 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "strict": true,
-    "ignoreDeprecations": "5.0"
   }
 }

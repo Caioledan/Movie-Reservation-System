@@ -1,10 +1,10 @@
 import { TicketStatus } from 'generated/prisma/enums';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID, Min } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID, Min, IsOptional } from 'class-validator';
 
 export class CreateTicketDto {
-  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', description: 'The ID of the user buying the ticket' })
-  @IsNotEmpty({ message: 'User ID is required.' })
+  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', description: 'The ID of the user buying the ticket', required: false })
+  @IsOptional()
   @IsUUID('4', { message: 'User ID must be a valid UUID.' })
   userId!: string;
 

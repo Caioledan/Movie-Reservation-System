@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, Min, IsOptional } from 'class-validator';
 
 export class CreateRoomDto {
   @ApiProperty({ example: 1, description: 'The unique number of the room.' })
@@ -15,6 +15,7 @@ export class CreateRoomDto {
   capacity!: number;
 
   @ApiProperty({ example: 10, description: 'Number of seats per row.', required: false })
+  @IsOptional()
   @IsInt({ message: 'Seats per row must be an integer.' })
   @Min(1, { message: 'Seats per row must be at least 1.' })
   seatsPerRow?: number;
