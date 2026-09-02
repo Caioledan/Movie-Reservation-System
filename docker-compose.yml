@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:15
+    container_name: movie_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: movie-reservation-system
+    ports:
+      - "5433:5432" # Host port : Container port
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: movie_api
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      # URL using 'db' as the hostname for the postgres container. 
+      # Since they are on the same docker network, 'db' resolves to the db container's IP.
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/movie-reservation-system?schema=public
+      - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_here}
+      - STRIPE_API_SECRET=${STRIPE_API_SECRET:-sk_test_123}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-whsec_123}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+
+volumes:
+  pgdata:
