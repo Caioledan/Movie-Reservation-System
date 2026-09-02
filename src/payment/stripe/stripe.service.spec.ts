@@ -20,7 +20,7 @@ describe('StripeService', () => {
     delete process.env.STRIPE_API_SECRET;
     delete process.env.STRIPE_WEBHOOK_SECRET;
     delete process.env.FRONTEND_URL;
-  })
+  });
 
   it('should be defined', () => {
     expect(service).toBeDefined();

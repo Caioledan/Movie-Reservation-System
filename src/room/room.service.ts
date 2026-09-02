@@ -1,16 +1,20 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class RoomService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async createRoom(data: CreateRoomDto) {
     const roomExists = await this.prisma.room.findFirst({
-      where: { number: data.number }
-    })
+      where: { number: data.number },
+    });
 
     if (roomExists) {
       throw new ConflictException('Room already exists.');
@@ -53,8 +57,8 @@ export class RoomService {
 
   async updateRoom(roomID: string, data: UpdateRoomDto) {
     const roomExists = await this.prisma.room.findUnique({
-      where: { id: roomID }
-    })
+      where: { id: roomID },
+    });
 
     if (!roomExists) {
       throw new NotFoundException('Room not found.');
@@ -70,8 +74,8 @@ export class RoomService {
 
   async deleteRoom(roomID: string) {
     const roomExists = await this.prisma.room.findUnique({
-      where: { id: roomID }
-    })
+      where: { id: roomID },
+    });
 
     if (!roomExists) {
       throw new NotFoundException('Room not found.');

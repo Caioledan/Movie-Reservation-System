@@ -13,7 +13,10 @@ export class CreateMovieDto {
   @IsString({ message: 'Title must be a string.' })
   title!: string;
 
-  @ApiProperty({ example: 'A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.' })
+  @ApiProperty({
+    example:
+      'A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.',
+  })
   @IsNotEmpty({ message: 'Description is required.' })
   @IsString({ message: 'Description must be a string.' })
   description!: string;

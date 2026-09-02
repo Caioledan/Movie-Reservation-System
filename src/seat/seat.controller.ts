@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { SeatService } from './seat.service';
 import { CreateSeatDto } from './dto/create-seat.dto';
 import { UpdateSeatDto } from './dto/update-seat.dto';
@@ -8,7 +17,7 @@ import { Role } from 'generated/prisma/enums';
 
 @Controller('seat')
 export class SeatController {
-  constructor(private readonly seatService: SeatService) { }
+  constructor(private readonly seatService: SeatService) {}
 
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN)

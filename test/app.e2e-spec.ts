@@ -25,7 +25,7 @@ describe('AppController (e2e)', () => {
       new ValidationPipe({
         whitelist: true,
         transform: true,
-      })
+      }),
     );
     await app.init();
 
@@ -58,7 +58,7 @@ describe('AppController (e2e)', () => {
           name: 'E2E Admin',
           email: testEmail,
           password: 'Password123!',
-          role: 'ADMIN'
+          role: 'ADMIN',
         })
         .expect(201);
 
@@ -115,12 +115,10 @@ describe('AppController (e2e)', () => {
       expect(res.body.number).toBe(9999);
       createdRoomId = res.body.id;
     });
-
-
   });
 
   describe('Session Flow', () => {
-    let sessionStartTime = '2027-01-01T12:00:00Z';
+    const sessionStartTime = '2027-01-01T12:00:00Z';
 
     it('should create a session', async () => {
       const res = await request(app.getHttpServer())
@@ -150,7 +148,9 @@ describe('AppController (e2e)', () => {
         })
         .expect(409);
 
-      expect(res.body.message).toContain('Room is already booked for this time');
+      expect(res.body.message).toContain(
+        'Room is already booked for this time',
+      );
     });
   });
 
@@ -158,7 +158,7 @@ describe('AppController (e2e)', () => {
     it('should reserve a seat', async () => {
       const seats = await prisma.seat.findMany({
         where: { roomId: createdRoomId },
-        take: 1
+        take: 1,
       });
 
       const res = await request(app.getHttpServer())
@@ -168,8 +168,8 @@ describe('AppController (e2e)', () => {
           sessionId: createdSessionId,
           seatId: seats[0].id,
           transactionId: 'tx_1234567890',
-          totalAmount: 25.50,
-          status: 'CONFIRMED'
+          totalAmount: 25.5,
+          status: 'CONFIRMED',
         })
         .expect(201);
 

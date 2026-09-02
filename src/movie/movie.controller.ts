@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
@@ -8,7 +17,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('movie')
 export class MovieController {
-  constructor(private readonly movieService: MovieService) { }
+  constructor(private readonly movieService: MovieService) {}
 
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN)
@@ -16,7 +25,6 @@ export class MovieController {
   async create(@Body() createMovieDto: CreateMovieDto) {
     return this.movieService.createMovie(createMovieDto);
   }
-
 
   @Get('get/:id')
   async getMovie(@Param('id') id: string) {
@@ -31,7 +39,10 @@ export class MovieController {
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN)
   @Patch('update/:id')
-  async update(@Param('id') id: string, @Body() updateMovieDto: UpdateMovieDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateMovieDto: UpdateMovieDto,
+  ) {
     return this.movieService.update(id, updateMovieDto);
   }
 
@@ -41,5 +52,4 @@ export class MovieController {
   async delete(@Param('id') id: string) {
     return this.movieService.delete(id);
   }
-
 }

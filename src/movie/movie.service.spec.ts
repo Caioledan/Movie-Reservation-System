@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MovieService } from './movie.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ConflictException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  ConflictException,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 
@@ -86,7 +90,9 @@ describe('MovieService', () => {
     it('should throw ConflictException if movie already exists', async () => {
       (prisma.movie.findFirst as jest.Mock).mockResolvedValue(mockMovie);
 
-      await expect(service.createMovie(createDto)).rejects.toThrow(ConflictException);
+      await expect(service.createMovie(createDto)).rejects.toThrow(
+        ConflictException,
+      );
       expect(prisma.movie.create).not.toHaveBeenCalled();
     });
   });
@@ -115,23 +121,33 @@ describe('MovieService', () => {
 
       const result = await service.delete(mockMovie.id);
 
-      expect(prisma.movie.findUnique).toHaveBeenCalledWith({ where: { id: mockMovie.id } });
-      expect(prisma.movie.delete).toHaveBeenCalledWith({ where: { id: mockMovie.id } });
+      expect(prisma.movie.findUnique).toHaveBeenCalledWith({
+        where: { id: mockMovie.id },
+      });
+      expect(prisma.movie.delete).toHaveBeenCalledWith({
+        where: { id: mockMovie.id },
+      });
       expect(result).toEqual({ message: 'Movie deleted with success' });
     });
 
     it('should throw NotFoundException if movie is not found', async () => {
       (prisma.movie.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.delete('invalid-id')).rejects.toThrow(NotFoundException);
+      await expect(service.delete('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
       expect(prisma.movie.delete).not.toHaveBeenCalled();
     });
 
     it('should throw InternalServerErrorException if delete operation fails', async () => {
       (prisma.movie.findUnique as jest.Mock).mockResolvedValue(mockMovie);
-      (prisma.movie.delete as jest.Mock).mockRejectedValue(new Error('DB Error'));
+      (prisma.movie.delete as jest.Mock).mockRejectedValue(
+        new Error('DB Error'),
+      );
 
-      await expect(service.delete(mockMovie.id)).rejects.toThrow(InternalServerErrorException);
+      await expect(service.delete(mockMovie.id)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 
@@ -141,14 +157,18 @@ describe('MovieService', () => {
 
       const result = await service.getMovie(mockMovie.id);
 
-      expect(prisma.movie.findUnique).toHaveBeenCalledWith({ where: { id: mockMovie.id } });
+      expect(prisma.movie.findUnique).toHaveBeenCalledWith({
+        where: { id: mockMovie.id },
+      });
       expect(result).toEqual(mockMovie);
     });
 
     it('should throw NotFoundException if movie is not found', async () => {
       (prisma.movie.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.getMovie('invalid-id')).rejects.toThrow(NotFoundException);
+      await expect(service.getMovie('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

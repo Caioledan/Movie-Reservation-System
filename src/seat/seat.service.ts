@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateSeatDto } from './dto/create-seat.dto';
 import { UpdateSeatDto } from './dto/update-seat.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -11,9 +15,9 @@ export class SeatService {
     const existingSeat = await this.prisma.seat.findFirst({
       where: {
         roomId: data.roomId,
-        seatNumber: data.seatNumber
-      }
-    })
+        seatNumber: data.seatNumber,
+      },
+    });
 
     if (existingSeat) {
       throw new ConflictException('Seat already exists');
@@ -33,33 +37,33 @@ export class SeatService {
 
   async updateSeat(seatId: string, data: UpdateSeatDto) {
     const seatExists = await this.prisma.seat.findUnique({
-      where: {id: seatId}
-    })
+      where: { id: seatId },
+    });
 
     if (!seatExists) {
       throw new NotFoundException('Seat not found');
     }
 
     const updatedSeat = await this.prisma.seat.update({
-      where: {id: seatId},
-      data: data
-    })
+      where: { id: seatId },
+      data: data,
+    });
 
     return updatedSeat;
   }
 
   async deleteSeat(seatId: string) {
     const seatExists = await this.prisma.seat.findUnique({
-      where: {id: seatId}
-    })
+      where: { id: seatId },
+    });
 
     if (!seatExists) {
       throw new NotFoundException('Seat not found');
     }
 
     await this.prisma.seat.delete({
-      where: {id: seatId}
-    })
+      where: { id: seatId },
+    });
 
     await this.prisma.room.update({
       where: { id: seatExists.roomId },
@@ -71,8 +75,8 @@ export class SeatService {
 
   async getSeatById(seatId: string) {
     const seatExists = await this.prisma.seat.findUnique({
-      where: {id: seatId}
-    })
+      where: { id: seatId },
+    });
 
     if (!seatExists) {
       throw new NotFoundException('Seat not found');

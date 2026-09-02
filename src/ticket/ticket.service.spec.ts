@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TicketService } from './ticket.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { TicketStatus } from 'generated/prisma/enums';
 
@@ -11,7 +15,7 @@ const mockTicket = {
   sessionId: 'session-id',
   seatId: 'seat-id',
   transactionId: 'tx-123',
-  totalAmount: 25.50,
+  totalAmount: 25.5,
   status: TicketStatus.CONFIRMED,
   createdAt: new Date(),
   updatedAt: new Date(),
@@ -60,13 +64,19 @@ describe('TicketService', () => {
       sessionId: 'session-id',
       seatId: 'seat-id',
       transactionId: 'tx-123',
-      totalAmount: 25.50,
+      totalAmount: 25.5,
       status: TicketStatus.CONFIRMED,
     };
 
     it('should create a ticket successfully when seat belongs to session room', async () => {
-      (prisma.seat.findUnique as jest.Mock).mockResolvedValue({ id: 'seat-id', roomId: 'room-id' });
-      (prisma.session.findUnique as jest.Mock).mockResolvedValue({ id: 'session-id', roomId: 'room-id' });
+      (prisma.seat.findUnique as jest.Mock).mockResolvedValue({
+        id: 'seat-id',
+        roomId: 'room-id',
+      });
+      (prisma.session.findUnique as jest.Mock).mockResolvedValue({
+        id: 'session-id',
+        roomId: 'room-id',
+      });
       (prisma.ticket.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.ticket.create as jest.Mock).mockResolvedValue(mockTicket);
 
@@ -79,29 +89,52 @@ describe('TicketService', () => {
     it('should throw NotFoundException if seat not found', async () => {
       (prisma.seat.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.createTicket('user-id', createDto)).rejects.toThrow(NotFoundException);
+      await expect(service.createTicket('user-id', createDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw NotFoundException if session not found', async () => {
-      (prisma.seat.findUnique as jest.Mock).mockResolvedValue({ id: 'seat-id', roomId: 'room-id' });
+      (prisma.seat.findUnique as jest.Mock).mockResolvedValue({
+        id: 'seat-id',
+        roomId: 'room-id',
+      });
       (prisma.session.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.createTicket('user-id', createDto)).rejects.toThrow(NotFoundException);
+      await expect(service.createTicket('user-id', createDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw BadRequestException if seat room does not match session room', async () => {
-      (prisma.seat.findUnique as jest.Mock).mockResolvedValue({ id: 'seat-id', roomId: 'room-1' });
-      (prisma.session.findUnique as jest.Mock).mockResolvedValue({ id: 'session-id', roomId: 'room-2' });
+      (prisma.seat.findUnique as jest.Mock).mockResolvedValue({
+        id: 'seat-id',
+        roomId: 'room-1',
+      });
+      (prisma.session.findUnique as jest.Mock).mockResolvedValue({
+        id: 'session-id',
+        roomId: 'room-2',
+      });
 
-      await expect(service.createTicket('user-id', createDto)).rejects.toThrow(BadRequestException);
+      await expect(service.createTicket('user-id', createDto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
-    
+
     it('should throw ConflictException if ticket already exists', async () => {
-      (prisma.seat.findUnique as jest.Mock).mockResolvedValue({ id: 'seat-id', roomId: 'room-id' });
-      (prisma.session.findUnique as jest.Mock).mockResolvedValue({ id: 'session-id', roomId: 'room-id' });
+      (prisma.seat.findUnique as jest.Mock).mockResolvedValue({
+        id: 'seat-id',
+        roomId: 'room-id',
+      });
+      (prisma.session.findUnique as jest.Mock).mockResolvedValue({
+        id: 'session-id',
+        roomId: 'room-id',
+      });
       (prisma.ticket.findFirst as jest.Mock).mockResolvedValue(mockTicket);
 
-      await expect(service.createTicket('user-id', createDto)).rejects.toThrow(ConflictException);
+      await expect(service.createTicket('user-id', createDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
@@ -111,14 +144,18 @@ describe('TicketService', () => {
 
       const result = await service.getTicketById('ticket-id');
 
-      expect(prisma.ticket.findUnique).toHaveBeenCalledWith({ where: { id: 'ticket-id' } });
+      expect(prisma.ticket.findUnique).toHaveBeenCalledWith({
+        where: { id: 'ticket-id' },
+      });
       expect(result).toEqual(mockTicket);
     });
 
     it('should throw NotFoundException if not found', async () => {
       (prisma.ticket.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.getTicketById('invalid')).rejects.toThrow(NotFoundException);
+      await expect(service.getTicketById('invalid')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -129,14 +166,18 @@ describe('TicketService', () => {
 
       const result = await service.deleteTicket('ticket-id');
 
-      expect(prisma.ticket.delete).toHaveBeenCalledWith({ where: { id: 'ticket-id' } });
+      expect(prisma.ticket.delete).toHaveBeenCalledWith({
+        where: { id: 'ticket-id' },
+      });
       expect(result).toEqual('Ticket deleted successfully');
     });
 
     it('should throw NotFoundException if ticket not found', async () => {
       (prisma.ticket.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.deleteTicket('ticket-id')).rejects.toThrow(NotFoundException);
+      await expect(service.deleteTicket('ticket-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

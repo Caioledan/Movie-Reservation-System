@@ -24,7 +24,7 @@ const prismaServiceMock = {
   },
   seat: {
     createMany: jest.fn(),
-  }
+  },
 };
 
 describe('RoomService', () => {
@@ -78,7 +78,9 @@ describe('RoomService', () => {
     it('should throw ConflictException if room already exists', async () => {
       (prisma.room.findFirst as jest.Mock).mockResolvedValue(mockRoom);
 
-      await expect(service.createRoom(createDto)).rejects.toThrow(ConflictException);
+      await expect(service.createRoom(createDto)).rejects.toThrow(
+        ConflictException,
+      );
       expect(prisma.room.create).not.toHaveBeenCalled();
       expect(prisma.seat.createMany).not.toHaveBeenCalled();
     });
@@ -94,7 +96,9 @@ describe('RoomService', () => {
 
       const result = await service.updateRoom(mockRoom.id, updateDto);
 
-      expect(prisma.room.findUnique).toHaveBeenCalledWith({ where: { id: mockRoom.id } });
+      expect(prisma.room.findUnique).toHaveBeenCalledWith({
+        where: { id: mockRoom.id },
+      });
       expect(prisma.room.update).toHaveBeenCalledWith({
         where: { id: mockRoom.id },
         data: updateDto,
@@ -105,7 +109,9 @@ describe('RoomService', () => {
     it('should throw NotFoundException if room is not found', async () => {
       (prisma.room.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.updateRoom('invalid-id', updateDto)).rejects.toThrow(NotFoundException);
+      await expect(service.updateRoom('invalid-id', updateDto)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(prisma.room.update).not.toHaveBeenCalled();
     });
   });
@@ -117,15 +123,21 @@ describe('RoomService', () => {
 
       const result = await service.deleteRoom(mockRoom.id);
 
-      expect(prisma.room.findUnique).toHaveBeenCalledWith({ where: { id: mockRoom.id } });
-      expect(prisma.room.delete).toHaveBeenCalledWith({ where: { id: mockRoom.id } });
+      expect(prisma.room.findUnique).toHaveBeenCalledWith({
+        where: { id: mockRoom.id },
+      });
+      expect(prisma.room.delete).toHaveBeenCalledWith({
+        where: { id: mockRoom.id },
+      });
       expect(result).toEqual(mockRoom);
     });
 
     it('should throw NotFoundException if room is not found', async () => {
       (prisma.room.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.deleteRoom('invalid-id')).rejects.toThrow(NotFoundException);
+      await expect(service.deleteRoom('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
       expect(prisma.room.delete).not.toHaveBeenCalled();
     });
   });
@@ -136,14 +148,18 @@ describe('RoomService', () => {
 
       const result = await service.getRoom(mockRoom.id);
 
-      expect(prisma.room.findUnique).toHaveBeenCalledWith({ where: { id: mockRoom.id } });
+      expect(prisma.room.findUnique).toHaveBeenCalledWith({
+        where: { id: mockRoom.id },
+      });
       expect(result).toEqual(mockRoom);
     });
 
     it('should throw NotFoundException if room is not found', async () => {
       (prisma.room.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.getRoom('invalid-id')).rejects.toThrow(NotFoundException);
+      await expect(service.getRoom('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

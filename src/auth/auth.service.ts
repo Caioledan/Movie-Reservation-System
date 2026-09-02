@@ -8,7 +8,7 @@ export class AuthService {
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async login(email: string, password: string) {
     let user;

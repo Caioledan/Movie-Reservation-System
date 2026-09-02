@@ -14,7 +14,7 @@ import { PassportModule } from '@nestjs/passport';
     JwtModule.registerAsync({
       global: true,
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: { expiresIn: '7d' },
       }),

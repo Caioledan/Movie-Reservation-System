@@ -31,7 +31,7 @@ describe('SeatService', () => {
             },
             room: {
               update: jest.fn(),
-            }
+            },
           },
         },
       ],
@@ -50,21 +50,25 @@ describe('SeatService', () => {
       (prisma.seat.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.seat.create as jest.Mock).mockResolvedValue(mockSeat);
 
-      const result = await service.createSeat({ roomId: 'room-id', seatNumber: 'A1' });
-      
+      const result = await service.createSeat({
+        roomId: 'room-id',
+        seatNumber: 'A1',
+      });
+
       expect(prisma.seat.create).toHaveBeenCalled();
       expect(prisma.room.update).toHaveBeenCalledWith({
         where: { id: 'room-id' },
-        data: { capacity: { increment: 1 } }
+        data: { capacity: { increment: 1 } },
       });
       expect(result).toEqual(mockSeat);
     });
 
     it('should throw ConflictException if seat exists', async () => {
       (prisma.seat.findFirst as jest.Mock).mockResolvedValue(mockSeat);
-      
-      await expect(service.createSeat({ roomId: 'room-id', seatNumber: 'A1' }))
-        .rejects.toThrow(ConflictException);
+
+      await expect(
+        service.createSeat({ roomId: 'room-id', seatNumber: 'A1' }),
+      ).rejects.toThrow(ConflictException);
     });
   });
 
@@ -78,15 +82,17 @@ describe('SeatService', () => {
       expect(prisma.seat.delete).toHaveBeenCalled();
       expect(prisma.room.update).toHaveBeenCalledWith({
         where: { id: 'room-id' },
-        data: { capacity: { decrement: 1 } }
+        data: { capacity: { decrement: 1 } },
       });
       expect(result).toEqual('Seat deleted successfully');
     });
 
     it('should throw NotFoundException if seat does not exist', async () => {
       (prisma.seat.findUnique as jest.Mock).mockResolvedValue(null);
-      
-      await expect(service.deleteSeat('seat-id')).rejects.toThrow(NotFoundException);
+
+      await expect(service.deleteSeat('seat-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

@@ -8,4 +8,4 @@ import { TicketModule } from '../ticket/ticket.module';
   controllers: [PaymentController],
   imports: [TicketModule],
 })
-export class PaymentModule { }
+export class PaymentModule {}
