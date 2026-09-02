@@ -10,6 +10,7 @@ import { RoomModule } from './room/room.module';
 import { SessionModule } from './session/session.module';
 import { TicketModule } from './ticket/ticket.module';
 import { SeatModule } from './seat/seat.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { SeatModule } from './seat/seat.module';
     PrismaModule, 
     UserModule, 
     AuthModule, 
-    MovieModule, RoomModule, SessionModule, TicketModule, SeatModule
+    MovieModule, RoomModule, SessionModule, TicketModule, SeatModule, PaymentModule
   ],
   controllers: [AppController],
   providers: [AppService],

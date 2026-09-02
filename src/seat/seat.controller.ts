@@ -35,4 +35,9 @@ export class SeatController {
   getSeatById(@Param('id') seatId: string) {
     return this.seatService.getSeatById(seatId);
   }
+
+  @Get()
+  getAllSeats() {
+    return this.seatService.getAllSeats();
+  }
 }

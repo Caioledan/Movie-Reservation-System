@@ -80,4 +80,8 @@ export class SeatService {
 
     return seatExists;
   }
+
+  async getAllSeats() {
+    return this.prisma.seat.findMany();
+  }
 }

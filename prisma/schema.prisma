@@ -4,8 +4,8 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider     = "prisma-client"
-  output       = "../generated/prisma"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -54,15 +54,15 @@ model Room {
 }
 
 model Session {
-  id        String   @id @default(uuid())
+  id        String        @id @default(uuid())
   movieId   String
   roomId    String
   startTime DateTime
   endTime   DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  movie     Movie    @relation(fields: [movieId], references: [id])
-  room      Room     @relation(fields: [roomId], references: [id])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  movie     Movie         @relation(fields: [movieId], references: [id])
+  room      Room          @relation(fields: [roomId], references: [id])
   tickets   Ticket[]
   status    SessionStatus @default(ACTIVE)
 }
@@ -95,7 +95,7 @@ model Ticket {
   user          User         @relation(fields: [userId], references: [id])
   transactionId String
   totalAmount   Float
-  status        TicketStatus
+  status        TicketStatus @default(PENDING)
 }
 
 enum TicketStatus {

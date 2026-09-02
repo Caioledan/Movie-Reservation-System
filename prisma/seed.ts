@@ -39,7 +39,7 @@ async function main() {
       posterImage: 'https://image.url/inception.jpg',
       genre: 'Sci-Fi',
       ageRating: 'PG-13',
-      duration: 148, // 148 minutes
+      duration: 148,
       language: 'English',
       releaseDate: new Date('2010-07-16T00:00:00Z'),
     },
