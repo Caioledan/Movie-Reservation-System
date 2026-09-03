@@ -155,3 +155,11 @@ skills-lock.json
 
 coverage/
 scratch/
+
+# Compiled config/seed artifacts
+prisma.config.js
+prisma.config.d.ts
+prisma.config.js.map
+prisma/seed.js
+prisma/seed.d.ts
+prisma/seed.js.map

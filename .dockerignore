@@ -10,3 +10,6 @@ scratch
 .eslintcache
 .prettierignore
 .eslintrc.js
+prisma.config.js
+prisma.config.d.ts
+prisma.config.js.map
