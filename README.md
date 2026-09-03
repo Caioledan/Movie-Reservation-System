@@ -1,6 +1,6 @@
 # Movie Reservation System API
 
-A robust, scalable, and cloud-native RESTful API built with NestJS for managing a movie theater reservation system. This project handles everything from user authentication and movie scheduling to real-time seat reservations and secure payment processing via Stripe.
+A robust, scalable, and cloud-native RESTful API built with NestJS for managing a movie theater reservation system. This project handles everything from user authentication and movie scheduling to real-time seat reservations and secure payment processing via Stripe. This project was based on this [https://roadmap.sh/projects/movie-reservation-system](https://roadmap.sh/projects/movie-reservation-system) project.
 
 ## Live Demo & Documentation
 
